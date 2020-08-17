@@ -11,8 +11,16 @@ import Private from './pages/private'
 import PrivateRoute from './components/PrivateRoute';
 import FirebaseProvider from './components/FirebaseProvider';
 
+// import komponent material UI
+import CssBaseline from '@material-ui/core/CssBaseline'
+import ThemeProvider from '@material-ui/styles/ThemeProvider'
+import theme from './config/theme'
+
 function App() {
   return (
+    <>
+    <CssBaseline />
+    <ThemeProvider theme={theme}>
       <FirebaseProvider>
       <Router> 
       <Switch>
@@ -32,6 +40,8 @@ function App() {
         </Switch>
       </Router>
       </FirebaseProvider>
+      </ThemeProvider>
+    </>
   );
 }
 
