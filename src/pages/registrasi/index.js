@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper"; // => kotak putih untuk melapisi objek
@@ -10,7 +10,63 @@ import Grid from '@material-ui/core/Grid'
 // import react router dom 
 import {Link} from 'react-router-dom';
 
+import isEmail from 'validator/lib/isEmail';
+
 function Registrasi() {
+    
+    const [form, setForm] = useState({
+        email:'',
+        password:'',
+        ulangi_password:''
+    });
+
+    const [error, setError] = useState({
+        email:'',
+        password:'',
+        ulangi_password:''
+    })
+
+    const handleChange = e => {
+        setForm({
+            ...form,
+            [e.target.name]:e.target.value
+        })
+    }
+
+    const validate = () => {
+        const newError = {...error};
+
+        if (!form.email){
+            newError.email = 'Email wajib diisi';
+        } else if (!isEmail(form.email)){
+            newError.email = 'Email tidak valid';
+        }
+
+        if (!form.password){
+            newError.password = 'Password wajib diisi';
+        } 
+
+        if(!form.ulangi_password){
+            newError.ulangi_password = 'Ulangi passowrd wajib diisi'
+        } else if (form.ulangi_password !== form.password){
+            newError.ulangi_password = 'Ulangi password tidak sama dengan Password'
+        }
+
+        return newError;
+    }
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        const findErrors = validate();
+
+        if (Object.keys(findErrors).some(err=>err!=='')){
+            setError(findErrors);
+        }
+
+    }
+    
+    console.log(form)
+    
     const classes = useStyles();
     return (
     <Container maxWidth="xs">
@@ -22,7 +78,7 @@ function Registrasi() {
         Buat Akun Baru
         </Typography>
 
-        <form>
+        <form onSubmit={handleSubmit} noValidate>
             <TextField
                 id="email"
                 type="email"
@@ -31,6 +87,10 @@ function Registrasi() {
                 label="Alamat Email"
                 fullWidth
                 required
+                value={form.email}
+                onChange={handleChange}
+                helperText={error.email}
+                error={error.email?true:false}
              />
             <TextField
                 id="password"
@@ -40,15 +100,23 @@ function Registrasi() {
                 label="Password"
                 fullWidth
                 required
+                value={form.pasword}
+                onChange={handleChange}
+                helperText={error.password}
+                error={error.password?true:false}
             />
             <TextField
                 id="ulangi_password"
-                type="ulangi_password"
+                type="password"
                 name="ulangi_password"
                 margin="normal"
                 label="Ulangi Password"
                 fullWidth
                 required
+                value={form.ulangi_password}
+                onChange={handleChange}
+                helperText={error.ulangi_password}
+                error={error.ulangi_password?true:false}
             />
             <Grid container className={classes.buttons}>
                 <Grid item xs>
