@@ -8,31 +8,59 @@ import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
 
 // import react router dom 
-import {Link} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 
 import isEmail from 'validator/lib/isEmail';
 
+// firebase hook 
+import { useFirebase } from '../../components/FirebaseProvider'
+
+// app component 
+import AppLoading from '../../components/AppLoading';
+
 function Registrasi() {
+
+    // untuk keperluan styling
+    const classes = useStyles();
     
+    // untuk form form nya
     const [form, setForm] = useState({
         email:'',
         password:'',
         ulangi_password:''
     });
 
+    // untuk error
     const [error, setError] = useState({
         email:'',
         password:'',
         ulangi_password:''
     })
 
+    // kondisi untuk mendisable/mengunci form ketika tombol
+    // register sudah diklik
+    const [isSubmitting, setSubmitting] = useState(false);
+
+    // untk keperluan authentikasi
+    const {auth, user, loading} = useFirebase();
+
+    
     const handleChange = e => {
+        // teknik tercepat untuk perubahan value/nilai di form input
         setForm({
             ...form,
             [e.target.name]:e.target.value
         })
+
+        // teknik tercepat untuk handle error di form input
+        setError({
+            ...error, 
+            [e.target.name]:''
+        })
     }
 
+    // menampilkan pesan error jika form masih kosong
+    // ketika tombol submit ditekan
     const validate = () => {
         const newError = {...error};
 
@@ -55,19 +83,54 @@ function Registrasi() {
         return newError;
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         const findErrors = validate();
 
-        if (Object.keys(findErrors).some(err=>err!=='')){
+        if (Object.values(findErrors).some(err=>err!=='')){
             setError(findErrors);
-        }
+        } else {
+            try {
+                setSubmitting(true);
+                await auth.createUserWithEmailAndPassword(
+                    form.email, form.password
+                )
+                
+            } catch(e){
+                const newError = {};
 
+                switch(e.code){
+                    case 'auth/email-already-in-use':
+                        newError.email = 'Email sudah terdaftar';
+                    break;
+                    case 'auth/invalid-email':
+                        newError.email ='Email tidak valid';
+                    break;
+                    case 'auth/weak-password':
+                        newError.password = 'Password lemah';
+                    break;
+                    case 'auth/operation-not-allower':
+                        newError.email = 'Metode email dan password tidak didukung';
+                    break;
+                    default:
+                        newError.email = 'Terjadi kesalahan. Silahkan dicoba lagi';
+                        break;
+                    
+                }
+                setError(newError);
+                setSubmitting(false);
+            }
+        }
     }
     
-    console.log(form)
+    if (loading){
+        return <AppLoading />
+    }
+
+    if (user){
+        return <Redirect to="/" />
+    }
     
-    const classes = useStyles();
     return (
     <Container maxWidth="xs">
       <Paper className={classes.paper}>
@@ -91,6 +154,7 @@ function Registrasi() {
                 onChange={handleChange}
                 helperText={error.email}
                 error={error.email?true:false}
+                disabled={isSubmitting}
              />
             <TextField
                 id="password"
@@ -104,6 +168,7 @@ function Registrasi() {
                 onChange={handleChange}
                 helperText={error.password}
                 error={error.password?true:false}
+                disabled={isSubmitting}
             />
             <TextField
                 id="ulangi_password"
@@ -117,10 +182,12 @@ function Registrasi() {
                 onChange={handleChange}
                 helperText={error.ulangi_password}
                 error={error.ulangi_password?true:false}
+                disabled={isSubmitting}
             />
             <Grid container className={classes.buttons}>
                 <Grid item xs>
                     <Button 
+                        disabled={isSubmitting}
                         type="submit"
                         color="primary"
                         variant="contained"
@@ -130,6 +197,7 @@ function Registrasi() {
                 </Grid>
                 <Grid item>
                     <Button
+                    disabled={isSubmitting}
                     component={Link} 
                         type="submit"  
                         variant="contained"
