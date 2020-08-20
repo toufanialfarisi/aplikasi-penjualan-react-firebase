@@ -6,7 +6,7 @@ import { Route, Switch } from 'react-router-dom' // imbrc
 import Pengaturan from './pengaturan'
 import Produk from './produk'
 import Transaksi from './transaksi'
-import Home from '../home'
+import Home from './home'
 
 function Private() {
     return (
