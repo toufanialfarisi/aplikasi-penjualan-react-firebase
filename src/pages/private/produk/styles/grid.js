@@ -17,6 +17,10 @@ const useStyles = makeStyles(theme => ({
         width:150,
         alignSelf:'center',
         textAlign:'center'
+    },
+    decoration:{
+        textDecoration:'none',
+        color:'black'
     }
 }));
 

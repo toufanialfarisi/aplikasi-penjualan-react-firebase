@@ -117,7 +117,7 @@ function GridProduk(){
                             </div>
                         }
                             <CardContent>
-                                <Typography variant="h5">
+                                <Typography variant="h5" component={Link} to={`/produk/edit/${produkDoc.id}`} className={classes.decoration}>
                                     {produkData.nama}
                                 </Typography>
                                 <Typography>
