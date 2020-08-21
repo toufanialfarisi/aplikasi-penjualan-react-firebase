@@ -5,6 +5,18 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         bottom: theme.spacing(4), 
         right: theme.spacing(4)
+    },
+    card:{
+        display:'flex'
+        
+    },
+    foto:{
+        width:150
+    },
+    fotoPlaceholder:{
+        width:150,
+        alignSelf:'center',
+        textAlign:'center'
     }
 }));
 
